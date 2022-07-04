@@ -2,4 +2,4 @@ import graph_functions
 
 if __name__ == "__main__":
     graph = graph_functions.Graph()
-    graph.print_graph()
+    graph.function_two()
