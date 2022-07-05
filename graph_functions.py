@@ -1,3 +1,4 @@
+from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -47,8 +48,98 @@ class Graph:
         # subax2 = plt.subplot(122)
         # nx.draw(self.graph, nlist=[range])
 
+    """
+    Resources:
+    https://networkx.org/documentation/stable/reference/algorithms/shortest_paths.html
+    https://networkx.org/documentation/stable/reference/classes/generated/networkx.DiGraph.edge_subgraph.html#networkx.DiGraph.edge_subgraph
+    https://networkx.org/documentation/stable/reference/classes/generated/networkx.Graph.nodes.html
+    https://networkx.org/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw.html
+    https://www.udacity.com/blog/2021/10/implementing-dijkstras-algorithm-in-python.html
+    https://benalexkeen.com/implementing-djikstras-shortest-path-algorithm-with-python/
+    """
+    # Check shortest path
+    def shortest_path(self, initial, end):
+        # self.graph is the graph
+        # initial is the starting vertex
+        # end is the targeted vertex
+            
+        # If no path between both vetices
+        while(not nx.has_path(self.graph, initial, end)):
+            print("No path found between both vertices")
+            return 0
+            #print("Reenter new vertices")
+            # Prompt the user to enter again
 
+        while(initial == end):
+            print("You have reach your destination")
+            # Exit the program
+            return 0
 
-    # Check if the graph has a cycle
-    #def check_cycle(self):
+        # List to store the vertices of the shortest path between initial and end
+        shortest_path_vertices = nx.shortest_path(self.graph, initial, end)
 
+        # List to store the edges of the shortest path between initial and end
+        shortest_path_edges = []
+        for j in range(len(shortest_path_vertices)-1):
+            shortest_path_edges.append((shortest_path_vertices[j],shortest_path_vertices[j+1]))
+        
+        # Stores the subgraph containing the shortest path traversed from desired source and target
+        shortest_sub = self.graph.edge_subgraph(shortest_path_edges)
+        self.print_graph(shortest_sub)
+        #return shortest_sub  
+    
+# User interface for the user
+def menu():
+    print(
+        """
+        _________________________________________
+                       FUNCTIONS
+        _________________________________________
+        Choose to perform:
+        1: Check whether the graph is strongly connected
+        2: Check whether the graph has any cycle
+        3: Check the shortest path between 2 vertices
+        4: Check the Minimum Spanning Tree (MST)
+        5: Reset Graph
+        6: Remove Edges
+        7: Exit
+        """
+        )
+
+def userinput():
+    while True:
+        try:
+            choice = int(input("Choice: "))
+        except ValueError:
+                print("This is invalid choice. Try again!")
+        else:
+            return choice
+
+def main():
+    graph = Graph()
+    
+    running = True
+    
+    while running:
+        menu()
+        choice = userinput()
+        
+        while choice:
+            if choice == 3:
+                print("===========================================================")
+                print("| Function 3:  Check the shortest path between 2 vertices |")
+                print("===========================================================")
+                
+                print("Which path would you like to find?")
+                initial = input("From: ")
+                end = input("To: ")
+                
+                if initial not in list(graph.graph.nodes) and end not in list(graph.graph.nodes):
+                    print("Invalid input. Please enter valid locations only.")
+                    return 0
+                    
+                s_path = graph.shortest_path(initial, end)
+                #graph.print_graph(s_path)
+                #plt.pause(0.1)
+            break
+        break
