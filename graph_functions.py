@@ -122,6 +122,20 @@ class Graph:
         ])
 
         return [start_vertex, end_vertex]
+    
+    def function_one(self):
+        # Determine if the graph is strongly connected by using the networkx built-in function is_strongly_connected
+        # This function returns True is it is a strongly connected graph
+        print("Strongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        
+        # Generate random edge until a strongly connected graph is found
+        while not nx.is_strongly_connected(self.graph):
+            self.add_random_edge()
+            
+        # Print the graph after a strongly connected graph is found
+        print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        self.print_graph()
+        
 
     def function_two(self):
         # Logging
