@@ -84,9 +84,9 @@ class Graph:
             shortest_path_edges.append((shortest_path_vertices[j],shortest_path_vertices[j+1]))
         
         # Stores the subgraph containing the shortest path traversed from desired source and target
-        shortest_sub = self.graph.edge_subgraph(shortest_path_edges)
-        self.print_graph(shortest_sub)
-        #return shortest_sub  
+        self.graph = self.graph.edge_subgraph(shortest_path_edges)
+        self.print_graph()
+        plt.pause(0.1)
     
 # User interface for the user
 def menu():
@@ -139,7 +139,5 @@ def main():
                     return 0
                     
                 s_path = graph.shortest_path(initial, end)
-                #graph.print_graph(s_path)
-                #plt.pause(0.1)
             break
         break
