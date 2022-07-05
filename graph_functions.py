@@ -1,13 +1,14 @@
 from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
 
 # A global list of vertex to be used in the class
 # vertex_list = ["LA", "BL", "SB", "RM", "MV"]
 vertex_list = [
     {"label": "LA", "fullname": "Los Angeles", "pos": (1, 4)},
     {"label": "BL", "fullname": "Berlin", "pos": (5, 6)},
-    {"label": "SB", "fullname": "Salzburg", "pos": (5, 5)},
+    {"label": "SB", "fullname": "Salzburg", "pos": (6, 5)},
     {"label": "RM", "fullname": "Rome", "pos": (5, 3)},
     {"label": "MV", "fullname": "Montevideo", "pos": (2, 1)},
 ]
@@ -32,7 +33,7 @@ class Graph:
         ])
 
         self.graph.add_weighted_edges_from([
-            (vertex_list[0]["label"], vertex_list[1]["label"], distance_LA_BL),
+            (vertex_list[1]["label"], vertex_list[0]["label"], distance_LA_BL),
             (vertex_list[1]["label"], vertex_list[2]["label"], distance_BL_SB),
             (vertex_list[2]["label"], vertex_list[3]["label"], distance_SB_RM),
             (vertex_list[3]["label"], vertex_list[4]["label"], distance_RM_MV),
@@ -40,16 +41,28 @@ class Graph:
         ])
 
     # Reset the graph by reinitializing the graph
-    def reset_graph(self):
+    def reset_graph(self, print_graph=False):
         self.__init__()
 
-    # Function to print the graph
-    def print_graph(self):
-        # subax1 = plt.subplot(121)
-        pos=nx.get_node_attributes(self.graph, "pos")
-        labels = nx.get_edge_attributes(self.graph, "weight")
-        nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+        if print_graph:
+            self.print_graph()
+
+    '''
+    Function to print the graph
+    If there is no graph or subgraph provided, the program will print the graph available inside the Graph class
+    else, it will print the graph or subgraph provided
+    '''
+    def print_graph(self, selected_graph=None):
+        if selected_graph is None:
+            pos = nx.get_node_attributes(self.graph, "pos")
+            labels = nx.get_edge_attributes(self.graph, "weight")
+            nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
+            nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+        else:
+            pos = nx.get_node_attributes(selected_graph, "pos")
+            labels = nx.get_edge_attributes(selected_graph, "weight")
+            nx.draw(selected_graph, pos, with_labels=True, font_weight='bold')
+            nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels)
         plt.show()
 
     # Print the adjacency list of the graph
@@ -130,50 +143,37 @@ class Graph:
 
         while not self.has_cycle():
             self.add_random_edge()
-        print("The cycle within the graph is from: " + str(sorted(nx.simple_cycles(self.graph))))
-        self.print_graph()
+        cycle_path = sorted(nx.simple_cycles(self.graph))[0]
+        print("The cycle within the graph is from: " + str(cycle_path))
 
-        """
-        Resources:
-        https://networkx.org/documentation/stable/reference/algorithms/shortest_paths.html
-        https://networkx.org/documentation/stable/reference/classes/generated/networkx.DiGraph.edge_subgraph.html#networkx.DiGraph.edge_subgraph
-        https://networkx.org/documentation/stable/reference/classes/generated/networkx.Graph.nodes.html
-        https://networkx.org/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw.html
-        https://www.udacity.com/blog/2021/10/implementing-dijkstras-algorithm-in-python.html
-        https://benalexkeen.com/implementing-djikstras-shortest-path-algorithm-with-python/
-        """
+        cycle_graph_vertices = []
+        for j in range(len(cycle_path)):
+            cycle_graph_vertices.append((cycle_path[j], cycle_path[j % len(cycle_path)]))
+        subgraph = self.graph.subgraph(cycle_path)
+        self.print_graph(selected_graph=subgraph)
 
-        # Check shortest path
-        def shortest_path(self, initial, end):
-            # self.graph is the graph
-            # initial is the starting vertex
-            # end is the targeted vertex
+    # Check shortest path
+    def function_three(self, start_vertex, end_vertex):
+        # If the vertex given is not inside the graph, abort the function
+        if start_vertex not in list(self.graph.nodes) and end_vertex not in list(self.graph.nodes):
+            print("Invalid input. Please enter valid locations only.")
+            return
 
-            # If no path between both vetices
-            while (not nx.has_path(self.graph, initial, end)):
-                print("No path found between both vertices")
-                return 0
-                # print("Reenter new vertices")
-                # Prompt the user to enter again
+        # If no path between both vertices
+        while not nx.has_path(self.graph, start_vertex, end_vertex):
+            # Logging
+            print("No path found between both vertices")
+            self.add_random_edge()
 
-            while (initial == end):
-                print("You have reach your destination")
-                # Exit the program
-                return 0
+        if len(nx.shortest_path(self.graph, start_vertex, end_vertex)) > 0:
+            # Stores a subgraph generated from adding a random edge
+            subgraph = self.graph.subgraph(nx.shortest_path(self.graph, start_vertex, end_vertex))
+            self.print_graph(selected_graph=subgraph)
+            plt.pause(0.1)
+        else:
+            print("Random edges added did not produce a path between the selected vertex.")
 
-            # List to store the vertices of the shortest path between initial and end
-            shortest_path_vertices = nx.shortest_path(self.graph, initial, end)
 
-        # List to store the edges of the shortest path between initial and end
-        shortest_path_edges = []
-        for j in range(len(shortest_path_vertices)-1):
-            shortest_path_edges.append((shortest_path_vertices[j],shortest_path_vertices[j+1]))
-        
-        # Stores the subgraph containing the shortest path traversed from desired source and target
-        self.graph = self.graph.edge_subgraph(shortest_path_edges)
-        self.print_graph()
-        plt.pause(0.1)
-    
 # User interface for the user
 def menu():
     print(
@@ -192,38 +192,45 @@ def menu():
         """
         )
 
-def userinput():
-    while True:
-        try:
-            choice = int(input("Choice: "))
-        except ValueError:
-                print("This is invalid choice. Try again!")
-        else:
-            return choice
 
-def main():
-    graph = Graph()
-    
-    running = True
-    
-    while running:
-        menu()
-        choice = userinput()
-        
-        while choice:
-            if choice == 3:
-                print("===========================================================")
-                print("| Function 3:  Check the shortest path between 2 vertices |")
-                print("===========================================================")
-                
-                print("Which path would you like to find?")
-                initial = input("From: ")
-                end = input("To: ")
-                
-                if initial not in list(graph.graph.nodes) and end not in list(graph.graph.nodes):
-                    print("Invalid input. Please enter valid locations only.")
-                    return 0
-                    
-                graph.shortest_path(initial, end)
-            break
-        break
+def user_input():
+    choice = int(input("Choice: "))
+    try:
+        while choice < 1 or choice > 7:
+            print("This is invalid choice. Try again!")
+            choice = int(input("Choice: "))
+    except ValueError:
+        print("This is invalid choice. Try again!")
+    return choice
+
+
+def function_interface(choice, graph):
+    if choice == 1:
+        pass
+    elif choice == 2:
+        print("======================================================")
+        print("| Function 2:  Check whether the graph has any cycle |")
+        print("======================================================")
+        Graph.function_two(graph)
+    elif choice == 3:
+        print("===========================================================")
+        print("| Function 3:  Check the shortest path between 2 vertices |")
+        print("===========================================================")
+
+        print("Which path would you like to find?")
+        start_vertex = input("From: ")
+        end_vertex = input("To: ")
+        Graph.function_three(graph, start_vertex, end_vertex)
+    elif choice == 4:
+        pass
+    elif choice == 5:
+        print_graph = str(input("Print graph after reset? [y/n]")).lower()
+        if print_graph == 'y':
+            Graph.reset_graph(graph, print_graph=True)
+        else:
+            Graph.reset_graph(graph)
+    elif choice == 6:
+        pass
+    else:
+        print("Something went wrong when taking user input, you have an input error. Try making an input again.")
+        return
