@@ -225,7 +225,5 @@ def main():
                     return 0
                     
                 s_path = graph.shortest_path(initial, end)
-                #graph.print_graph(s_path)
-                #plt.pause(0.1)
             break
         break
