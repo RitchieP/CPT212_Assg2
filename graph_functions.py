@@ -42,6 +42,17 @@ class Graph:
     # Reset the graph by reinitializing the graph
     def reset_graph(self):
         self.__init__()
+        
+    # Add new edge enter by user
+    def add_new_edge(self):
+        print("\nPlease key in the source and destination vertices you wish to add the edge." + 
+              "\n\n[Enter any one of the city abbreviation as follow]" +
+              "\nLA / BL / SB / RM / MV")
+        v1 = input("\nSource vertex: ")
+        v2 = input("Destination vertex: ")
+        self.graph.add_edge(v1, v2)
+        plt.title("GRAPH WITH NEWLY ADDED EDGE")
+        self.print_graph()
 
     # Function to print the graph
     def print_graph(self):
@@ -83,7 +94,7 @@ class Graph:
         nonedges = list(nx.non_edges(undirected_graph))
 
         # Logging
-        print("List of edges: " + str(nonedges))
+        print("\nList of edges: " + str(nonedges))
         print("Number of non-edges: " + str(len(nonedges)))
 
         # Compute the edge distance based on the vertex combination
@@ -134,6 +145,7 @@ class Graph:
             
         # Print the graph after a strongly connected graph is found
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        plt.title("STRONGLY CONNECTED GRAPH")
         self.print_graph()
         
 
