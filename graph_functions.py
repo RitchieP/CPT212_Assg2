@@ -138,6 +138,6 @@ def main():
                     print("Invalid input. Please enter valid locations only.")
                     return 0
                     
-                s_path = graph.shortest_path(initial, end)
+                graph.shortest_path(initial, end)
             break
         break
