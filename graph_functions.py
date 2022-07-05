@@ -1,19 +1,20 @@
-from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
 
 # A global list of vertex to be used in the class
 # vertex_list = ["LA", "BL", "SB", "RM", "MV"]
 vertex_list = [
     {"label": "LA", "fullname": "Los Angeles", "pos": (1, 4)},
     {"label": "BL", "fullname": "Berlin", "pos": (5, 6)},
-    {"label": "SB", "fullname": "Salzburg", "pos": (5, 5)},
+    {"label": "SB", "fullname": "Salzburg", "pos": (6, 5)},
     {"label": "RM", "fullname": "Rome", "pos": (5, 3)},
     {"label": "MV", "fullname": "Montevideo", "pos": (2, 1)},
 ]
 
+
 class Graph:
-    # Constructor to initialize the matrix
+    # Constructor to initialize the graph
     def __init__(self):
         distance_LA_BL = 9310
         distance_BL_SB = 526
@@ -31,113 +32,102 @@ class Graph:
         ])
 
         self.graph.add_weighted_edges_from([
-            (vertex_list[0]["label"], vertex_list[1]["label"], distance_LA_BL),
+            (vertex_list[1]["label"], vertex_list[0]["label"], distance_LA_BL),
             (vertex_list[1]["label"], vertex_list[2]["label"], distance_BL_SB),
             (vertex_list[2]["label"], vertex_list[3]["label"], distance_SB_RM),
             (vertex_list[3]["label"], vertex_list[4]["label"], distance_RM_MV),
             (vertex_list[4]["label"], vertex_list[0]["label"], distance_MV_LA)
         ])
 
+    # Reset the graph by reinitializing the graph
+    def reset_graph(self):
+        self.__init__()
+
+    # Function to print the graph
     def print_graph(self):
-        # subax1 = plt.subplot(121)
-        pos=nx.get_node_attributes(self.graph, "pos")
+        pos = nx.get_node_attributes(self.graph, "pos")
         labels = nx.get_edge_attributes(self.graph, "weight")
         nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
         nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
         plt.show()
-        # subax2 = plt.subplot(122)
-        # nx.draw(self.graph, nlist=[range])
 
-    """
-    Resources:
-    https://networkx.org/documentation/stable/reference/algorithms/shortest_paths.html
-    https://networkx.org/documentation/stable/reference/classes/generated/networkx.DiGraph.edge_subgraph.html#networkx.DiGraph.edge_subgraph
-    https://networkx.org/documentation/stable/reference/classes/generated/networkx.Graph.nodes.html
-    https://networkx.org/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw.html
-    https://www.udacity.com/blog/2021/10/implementing-dijkstras-algorithm-in-python.html
-    https://benalexkeen.com/implementing-djikstras-shortest-path-algorithm-with-python/
-    """
-    # Check shortest path
-    def shortest_path(self, initial, end):
-        # self.graph is the graph
-        # initial is the starting vertex
-        # end is the targeted vertex
-            
-        # If no path between both vetices
-        while(not nx.has_path(self.graph, initial, end)):
-            print("No path found between both vertices")
-            return 0
-            #print("Reenter new vertices")
-            # Prompt the user to enter again
+    # Print the adjacency list of the graph
+    def print_adjacency_list(self):
+        print("==================================")
+        print("Adjacency List for graph, first column is the starting vertex, while the following columns are adjacent "
+              "vertices")
+        for line in nx.generate_adjlist(self.graph):
+            print(line)
 
-        while(initial == end):
-            print("You have reach your destination")
-            # Exit the program
-            return 0
+    # Check if the graph has a cycle, return True if a cycle is detected
+    def has_cycle(self):
+        return len(sorted(nx.simple_cycles(self.graph))) > 0
 
-        # List to store the vertices of the shortest path between initial and end
-        shortest_path_vertices = nx.shortest_path(self.graph, initial, end)
+    # Add a random edge in the graph
+    def add_random_edge(self):
+        # Define the other edge's distance
+        distance_LA_SB = 9704
+        distance_LA_RM = 10190
+        distance_BL_RM = 1184
+        distance_BL_MV = 11817
+        distance_SB_MV = 11477
 
-        # List to store the edges of the shortest path between initial and end
-        shortest_path_edges = []
-        for j in range(len(shortest_path_vertices)-1):
-            shortest_path_edges.append((shortest_path_vertices[j],shortest_path_vertices[j+1]))
-        
-        # Stores the subgraph containing the shortest path traversed from desired source and target
-        self.graph = self.graph.edge_subgraph(shortest_path_edges)
+        '''
+        Create a copy of the DiGraph with undirected edges, to avoid overlapping of edges when generating random edges
+        This issue is further elaborated here https://github.com/RitchieP/CPT212_Assg2/issues/1
+        '''
+        undirected_graph = self.graph.to_undirected()
+
+        edge_distance = 0
+        # Get the list of nodes that dose not have an edge, then randomly choose from there
+        nonedges = list(nx.non_edges(undirected_graph))
+
+        # Logging
+        print("List of edges: " + str(nonedges))
+        print("Number of non-edges: " + str(len(nonedges)))
+
+        # Compute the edge distance based on the vertex combination
+        chosen_edge = list(random.choice(nonedges))
+        if (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "SB" or chosen_edge[1] == "SB"):
+            edge_distance = distance_LA_SB
+        elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "RM" or chosen_edge[1] == "RM"):
+            edge_distance = distance_LA_RM
+        elif (chosen_edge[0] == "BL" or chosen_edge[1] == "BL") and (chosen_edge[0] == "RM" or chosen_edge[1] == "RM"):
+            edge_distance = distance_BL_RM
+        elif (chosen_edge[0] == "BL" or chosen_edge[1] == "BL") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
+            edge_distance = distance_BL_MV
+        elif (chosen_edge[0] == "SB" or chosen_edge[1] == "SB") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
+            edge_distance = distance_SB_MV
+
+        # Logging
+        print("Chosen edge is between: " + chosen_edge[0] + " " + chosen_edge[1])
+        print("Distance: " + str(edge_distance))
+
+        '''
+        Because of the edges generated is from an undirected graph, the direction will always be the same. The only
+        random choice made is just the choice of edge. The code statements below will randomly select the starting edge
+        and the ending edge randomly to produce a random direction.
+        '''
+        start_vertex = random.choice(chosen_edge)
+        chosen_edge.remove(start_vertex)
+        end_vertex = chosen_edge[0]
+
+        # Logging
+        print("Starting vertex: " + start_vertex)
+        print("End vertex: " + end_vertex)
+
+        # Add the random edge
+        self.graph.add_weighted_edges_from([
+            (start_vertex, end_vertex, edge_distance)
+        ])
+
+        return [start_vertex, end_vertex]
+
+    def function_two(self):
+        # Logging
+        print("Graph cycle: " + str(self.has_cycle()))
+
+        while not self.has_cycle():
+            self.add_random_edge()
+        print("The cycle within the graph is from: " + str(sorted(nx.simple_cycles(self.graph))))
         self.print_graph()
-        plt.pause(0.1)
-    
-# User interface for the user
-def menu():
-    print(
-        """
-        _________________________________________
-                       FUNCTIONS
-        _________________________________________
-        Choose to perform:
-        1: Check whether the graph is strongly connected
-        2: Check whether the graph has any cycle
-        3: Check the shortest path between 2 vertices
-        4: Check the Minimum Spanning Tree (MST)
-        5: Reset Graph
-        6: Remove Edges
-        7: Exit
-        """
-        )
-
-def userinput():
-    while True:
-        try:
-            choice = int(input("Choice: "))
-        except ValueError:
-                print("This is invalid choice. Try again!")
-        else:
-            return choice
-
-def main():
-    graph = Graph()
-    
-    running = True
-    
-    while running:
-        menu()
-        choice = userinput()
-        
-        while choice:
-            if choice == 3:
-                print("===========================================================")
-                print("| Function 3:  Check the shortest path between 2 vertices |")
-                print("===========================================================")
-                
-                print("Which path would you like to find?")
-                initial = input("From: ")
-                end = input("To: ")
-                
-                if initial not in list(graph.graph.nodes) and end not in list(graph.graph.nodes):
-                    print("Invalid input. Please enter valid locations only.")
-                    return 0
-                    
-                graph.shortest_path(initial, end)
-            break
-        break
