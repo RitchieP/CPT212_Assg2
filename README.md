@@ -6,3 +6,5 @@ distance from one city to another
 https://stackabuse.com/courses/graphs-in-python-theory-and-implementation/lessons/representing-graphs-in-code/
 
 https://networkx.org/ 
+
+https://stackoverflow.com/questions/42591549/add-and-delete-a-random-edge-in-networkx

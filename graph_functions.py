@@ -7,14 +7,14 @@ import random
 vertex_list = [
     {"label": "LA", "fullname": "Los Angeles", "pos": (1, 4)},
     {"label": "BL", "fullname": "Berlin", "pos": (5, 6)},
-    {"label": "SB", "fullname": "Salzburg", "pos": (5, 5)},
+    {"label": "SB", "fullname": "Salzburg", "pos": (6, 5)},
     {"label": "RM", "fullname": "Rome", "pos": (5, 3)},
     {"label": "MV", "fullname": "Montevideo", "pos": (2, 1)},
 ]
 
 
 class Graph:
-    # Constructor to initialize the matrix
+    # Constructor to initialize the graph
     def __init__(self):
         distance_LA_BL = 9310
         distance_BL_SB = 526
@@ -51,29 +51,43 @@ class Graph:
         nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
         plt.show()
 
+    # Print the adjacency list of the graph
+    def print_adjacency_list(self):
+        print("==================================")
+        print("Adjacency List for graph, first column is the starting vertex, while the following columns are adjacent "
+              "vertices")
+        for line in nx.generate_adjlist(self.graph):
+            print(line)
+
     # Check if the graph has a cycle, return True if a cycle is detected
     def has_cycle(self):
-        if len(sorted(nx.simple_cycles(self.graph))) < 1:
-            return False
-        return True
+        return len(sorted(nx.simple_cycles(self.graph))) > 0
 
     # Add a random edge in the graph
     def add_random_edge(self):
+        # Define the other edge's distance
         distance_LA_SB = 9704
         distance_LA_RM = 10190
         distance_BL_RM = 1184
         distance_BL_MV = 11817
         distance_SB_MV = 11477
 
+        '''
+        Create a copy of the DiGraph with undirected edges, to avoid overlapping of edges when generating random edges
+        This issue is further elaborated here https://github.com/RitchieP/CPT212_Assg2/issues/1
+        '''
+        undirected_graph = self.graph.to_undirected()
+
         edge_distance = 0
         # Get the list of nodes that dose not have an edge, then randomly choose from there
-        nonedges = list(nx.non_edges(self.graph))
+        nonedges = list(nx.non_edges(undirected_graph))
 
         # Logging
-        print(nonedges)
+        print("List of edges: " + str(nonedges))
         print("Number of non-edges: " + str(len(nonedges)))
 
-        chosen_edge = random.choice(nonedges)
+        # Compute the edge distance based on the vertex combination
+        chosen_edge = list(random.choice(nonedges))
         if (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "SB" or chosen_edge[1] == "SB"):
             edge_distance = distance_LA_SB
         elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "RM" or chosen_edge[1] == "RM"):
@@ -86,13 +100,28 @@ class Graph:
             edge_distance = distance_SB_MV
 
         # Logging
-        print("Chosen edge is from: " + chosen_edge[0] + " " + chosen_edge[1])
+        print("Chosen edge is between: " + chosen_edge[0] + " " + chosen_edge[1])
         print("Distance: " + str(edge_distance))
+
+        '''
+        Because of the edges generated is from an undirected graph, the direction will always be the same. The only
+        random choice made is just the choice of edge. The code statements below will randomly select the starting edge
+        and the ending edge randomly to produce a random direction.
+        '''
+        start_vertex = random.choice(chosen_edge)
+        chosen_edge.remove(start_vertex)
+        end_vertex = chosen_edge[0]
+
+        # Logging
+        print("Starting vertex: " + start_vertex)
+        print("End vertex: " + end_vertex)
 
         # Add the random edge
         self.graph.add_weighted_edges_from([
-            (chosen_edge[0], chosen_edge[1], edge_distance)
+            (start_vertex, end_vertex, edge_distance)
         ])
+
+        return [start_vertex, end_vertex]
 
     def function_two(self):
         # Logging
@@ -100,4 +129,5 @@ class Graph:
 
         while not self.has_cycle():
             self.add_random_edge()
+        print("The cycle within the graph is from: " + str(sorted(nx.simple_cycles(self.graph))))
         self.print_graph()
