@@ -1,7 +1,6 @@
 from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
-import random
 
 # A global list of vertex to be used in the class
 # vertex_list = ["LA", "BL", "SB", "RM", "MV"]
@@ -165,16 +164,16 @@ class Graph:
             # List to store the vertices of the shortest path between initial and end
             shortest_path_vertices = nx.shortest_path(self.graph, initial, end)
 
-            # List to store the edges of the shortest path between initial and end
-            shortest_path_edges = []
-            for j in range(len(shortest_path_vertices) - 1):
-                shortest_path_edges.append((shortest_path_vertices[j], shortest_path_vertices[j + 1]))
-
-            # Stores the subgraph containing the shortest path traversed from desired source and target
-            shortest_sub = self.graph.edge_subgraph(shortest_path_edges)
-            self.print_graph(shortest_sub)
-            # return shortest_sub
-       
+        # List to store the edges of the shortest path between initial and end
+        shortest_path_edges = []
+        for j in range(len(shortest_path_vertices)-1):
+            shortest_path_edges.append((shortest_path_vertices[j],shortest_path_vertices[j+1]))
+        
+        # Stores the subgraph containing the shortest path traversed from desired source and target
+        self.graph = self.graph.edge_subgraph(shortest_path_edges)
+        self.print_graph()
+        plt.pause(0.1)
+    
 # User interface for the user
 def menu():
     print(
@@ -201,7 +200,7 @@ def userinput():
                 print("This is invalid choice. Try again!")
         else:
             return choice
-        
+
 def main():
     graph = Graph()
     
