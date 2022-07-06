@@ -32,9 +32,9 @@ def user_input():
 
 def function_interface(choice, graph):
     if choice == 1:
-        print("======================================================")
+        print("==============================================================")
         print("| Function 1:  Check whether the graph is strongly connected |")
-        print("======================================================")
+        print("==============================================================")
         graph.function_one()
     
     elif choice == 2:
