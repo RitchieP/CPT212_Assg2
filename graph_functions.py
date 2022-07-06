@@ -88,12 +88,21 @@ class Graph:
         Create a copy of the DiGraph with undirected edges, to avoid overlapping of edges when generating random edges
         This issue is further elaborated here https://github.com/RitchieP/CPT212_Assg2/issues/1
         '''
-        undirected_graph = self.graph.to_undirected()
+ 
+        #####SUGGEST TO MODIFY THIS BY REMOVING THE STEP TO CONVERT TO UNDIRECTED#####
+        # undirected_graph = self.graph.to_undirected()
 
+        # edge_distance = 0
+        # # Get the list of nodes that dose not have an edge, then randomly choose from there
+        # nonedges = list(nx.non_edges(undirected_graph))
+        
+        ##############################################################################
+
+        #####MODIFIED VERSION (NO OVERLAP HAPPENS AS IT IS CONSIDERED AS DIFFERENT DIRECTION?####
         edge_distance = 0
-        # Get the list of nodes that dose not have an edge, then randomly choose from there
-        nonedges = list(nx.non_edges(undirected_graph))
-
+        nonedges = list(nx.non_edges(self.graph))
+        #####################################################
+        
         # Logging
         print("\nList of edges: " + str(nonedges))
         print("Number of non-edges: " + str(len(nonedges)))
@@ -138,7 +147,8 @@ class Graph:
     def function_one(self):
         # Determine if the graph is strongly connected by using the networkx built-in function is_strongly_connected
         # This function returns True is it is a strongly connected graph
-        print("Strongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        input("\nPress any key to continue...")
         
         # Generate random edge until a strongly connected graph is found
         while not nx.is_strongly_connected(self.graph):
