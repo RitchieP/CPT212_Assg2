@@ -44,14 +44,15 @@ class Graph:
         self.__init__()
         
     # Add new edge enter by user
-    def add_new_edge(self):
-        print("\nPlease key in the source and destination vertices you wish to add the edge." + 
-              "\n\n[Enter any one of the city abbreviation as follow]" +
-              "\nLA / BL / SB / RM / MV")
-        v1 = input("\nSource vertex: ")
-        v2 = input("Destination vertex: ")
+    def add_new_edge(self, v1, v2):
         self.graph.add_edge(v1, v2)
         plt.title("GRAPH WITH NEWLY ADDED EDGE")
+        self.print_graph()
+        
+    # Add new edge enter by user
+    def remove_edge(self, v1, v2):
+        self.graph.remove_edge(v1, v2)
+        plt.title("GRAPH WITH REMOVED EDGE")
         self.print_graph()
 
     # Function to print the graph
