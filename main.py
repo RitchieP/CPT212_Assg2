@@ -1,11 +1,9 @@
 import user_interface
 import graph_functions
-import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     
     graph = graph_functions.Graph()
-    
     print("Default graph is as follow:")
     graph.print_graph()
 
@@ -20,3 +18,4 @@ if __name__ == "__main__":
     # Printing the adjacency list for the graph
     # graph.print_adjacency_list()1
     
+

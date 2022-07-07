@@ -1,3 +1,4 @@
+from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
@@ -40,7 +41,7 @@ class Graph:
         ])
 
     # Reset the graph by reinitializing the graph
-    def reset_graph(self):
+    def reset_graph(self, print_graph=False):
         self.__init__()
         
     # Add new edge enter by user
@@ -55,12 +56,25 @@ class Graph:
         plt.title("GRAPH WITH REMOVED EDGE")
         self.print_graph()
 
-    # Function to print the graph
-    def print_graph(self):
-        pos = nx.get_node_attributes(self.graph, "pos")
-        labels = nx.get_edge_attributes(self.graph, "weight")
-        nx.draw(self.graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels, font_size=7)
+        if print_graph:
+            self.print_graph()
+
+    '''
+    Function to print the graph
+    If there is no graph or subgraph provided, the program will print the graph available inside the Graph class
+    else, it will print the graph or subgraph provided
+    '''
+    def print_graph(self, selected_graph=None):
+        if selected_graph is None:
+            pos = nx.get_node_attributes(self.graph, "pos")
+            labels = nx.get_edge_attributes(self.graph, "weight")
+            nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
+            nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+        else:
+            pos = nx.get_node_attributes(selected_graph, "pos")
+            labels = nx.get_edge_attributes(selected_graph, "weight")
+            nx.draw(selected_graph, pos, with_labels=True, font_weight='bold')
+            nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels)
         plt.show()
 
     # Print the adjacency list of the graph
@@ -150,5 +164,94 @@ class Graph:
 
         while not self.has_cycle():
             self.add_random_edge()
-        print("The cycle within the graph is from: " + str(sorted(nx.simple_cycles(self.graph))))
-        self.print_graph()
+        cycle_path = sorted(nx.simple_cycles(self.graph))[0]
+        print("The cycle within the graph is from: " + str(cycle_path))
+
+        cycle_graph_vertices = []
+        for j in range(len(cycle_path)):
+            cycle_graph_vertices.append((cycle_path[j], cycle_path[j % len(cycle_path)]))
+        subgraph = self.graph.subgraph(cycle_path)
+        self.print_graph(selected_graph=subgraph)
+
+    # Check shortest path
+    def function_three(self, start_vertex, end_vertex):
+        # If the vertex given is not inside the graph, abort the function
+        if start_vertex not in list(self.graph.nodes) and end_vertex not in list(self.graph.nodes):
+            print("Invalid input. Please enter valid locations only.")
+            return
+
+        # If no path between both vertices
+        while not nx.has_path(self.graph, start_vertex, end_vertex):
+            # Logging
+            print("No path found between both vertices")
+            self.add_random_edge()
+
+        if len(nx.shortest_path(self.graph, start_vertex, end_vertex)) > 0:
+            # Stores a subgraph generated from adding a random edge
+            subgraph = self.graph.subgraph(nx.shortest_path(self.graph, start_vertex, end_vertex))
+            self.print_graph(selected_graph=subgraph)
+            plt.pause(0.1)
+        else:
+            print("Random edges added did not produce a path between the selected vertex.")
+
+
+# User interface for the user
+def menu():
+    print(
+        """
+        _________________________________________
+                       FUNCTIONS
+        _________________________________________
+        Choose to perform:
+        1: Check whether the graph is strongly connected
+        2: Check whether the graph has any cycle
+        3: Check the shortest path between 2 vertices
+        4: Check the Minimum Spanning Tree (MST)
+        5: Reset Graph
+        6: Remove Edges
+        7: Exit
+        """
+        )
+
+
+def user_input():
+    choice = int(input("Choice: "))
+    try:
+        while choice < 1 or choice > 7:
+            print("This is invalid choice. Try again!")
+            choice = int(input("Choice: "))
+    except ValueError:
+        print("This is invalid choice. Try again!")
+    return choice
+
+
+def function_interface(choice, graph):
+    if choice == 1:
+        pass
+    elif choice == 2:
+        print("======================================================")
+        print("| Function 2:  Check whether the graph has any cycle |")
+        print("======================================================")
+        Graph.function_two(graph)
+    elif choice == 3:
+        print("===========================================================")
+        print("| Function 3:  Check the shortest path between 2 vertices |")
+        print("===========================================================")
+
+        print("Which path would you like to find?")
+        start_vertex = input("From: ")
+        end_vertex = input("To: ")
+        Graph.function_three(graph, start_vertex, end_vertex)
+    elif choice == 4:
+        pass
+    elif choice == 5:
+        print_graph = str(input("Print graph after reset? [y/n]")).lower()
+        if print_graph == 'y':
+            Graph.reset_graph(graph, print_graph=True)
+        else:
+            Graph.reset_graph(graph)
+    elif choice == 6:
+        pass
+    else:
+        print("Something went wrong when taking user input, you have an input error. Try making an input again.")
+        return
