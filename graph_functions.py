@@ -42,13 +42,25 @@ class Graph:
     # Reset the graph by reinitializing the graph
     def reset_graph(self):
         self.__init__()
+        
+    # Add new edge enter by user
+    def add_new_edge(self, v1, v2):
+        self.graph.add_edge(v1, v2)
+        plt.title("GRAPH WITH NEWLY ADDED EDGE")
+        self.print_graph()
+        
+    # Add new edge enter by user
+    def remove_edge(self, v1, v2):
+        self.graph.remove_edge(v1, v2)
+        plt.title("GRAPH WITH REMOVED EDGE")
+        self.print_graph()
 
     # Function to print the graph
     def print_graph(self):
         pos = nx.get_node_attributes(self.graph, "pos")
         labels = nx.get_edge_attributes(self.graph, "weight")
-        nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+        nx.draw(self.graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels, font_size=7)
         plt.show()
 
     # Print the adjacency list of the graph
@@ -71,19 +83,12 @@ class Graph:
         distance_BL_RM = 1184
         distance_BL_MV = 11817
         distance_SB_MV = 11477
-
-        '''
-        Create a copy of the DiGraph with undirected edges, to avoid overlapping of edges when generating random edges
-        This issue is further elaborated here https://github.com/RitchieP/CPT212_Assg2/issues/1
-        '''
-        undirected_graph = self.graph.to_undirected()
-
+ 
         edge_distance = 0
-        # Get the list of nodes that dose not have an edge, then randomly choose from there
-        nonedges = list(nx.non_edges(undirected_graph))
-
+        nonedges = list(nx.non_edges(self.graph))
+        
         # Logging
-        print("List of edges: " + str(nonedges))
+        print("\nList of edges: " + str(nonedges))
         print("Number of non-edges: " + str(len(nonedges)))
 
         # Compute the edge distance based on the vertex combination
@@ -122,6 +127,22 @@ class Graph:
         ])
 
         return [start_vertex, end_vertex]
+    
+    def function_one(self):
+        # Determine if the graph is strongly connected by using the networkx built-in function is_strongly_connected
+        # This function returns True is it is a strongly connected graph
+        print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        input("\nPress any key to continue...")
+        
+        # Generate random edge until a strongly connected graph is found
+        while not nx.is_strongly_connected(self.graph):
+            self.add_random_edge()
+            
+        # Print the graph after a strongly connected graph is found
+        print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
+        plt.title("STRONGLY CONNECTED GRAPH")
+        self.print_graph()
+        
 
     def function_two(self):
         # Logging
