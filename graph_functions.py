@@ -59,8 +59,8 @@ class Graph:
     def print_graph(self):
         pos = nx.get_node_attributes(self.graph, "pos")
         labels = nx.get_edge_attributes(self.graph, "weight")
-        nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+        nx.draw(self.graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels, font_size=7)
         plt.show()
 
     # Print the adjacency list of the graph
@@ -83,25 +83,9 @@ class Graph:
         distance_BL_RM = 1184
         distance_BL_MV = 11817
         distance_SB_MV = 11477
-
-        '''
-        Create a copy of the DiGraph with undirected edges, to avoid overlapping of edges when generating random edges
-        This issue is further elaborated here https://github.com/RitchieP/CPT212_Assg2/issues/1
-        '''
  
-        #####SUGGEST TO MODIFY THIS BY REMOVING THE STEP TO CONVERT TO UNDIRECTED#####
-        # undirected_graph = self.graph.to_undirected()
-
-        # edge_distance = 0
-        # # Get the list of nodes that dose not have an edge, then randomly choose from there
-        # nonedges = list(nx.non_edges(undirected_graph))
-        
-        ##############################################################################
-
-        #####MODIFIED VERSION (NO OVERLAP HAPPENS AS IT IS CONSIDERED AS DIFFERENT DIRECTION?####
         edge_distance = 0
         nonedges = list(nx.non_edges(self.graph))
-        #####################################################
         
         # Logging
         print("\nList of edges: " + str(nonedges))
