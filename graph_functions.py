@@ -5,6 +5,8 @@ import random
 
 # A global list of vertex to be used in the class
 # vertex_list = ["LA", "BL", "SB", "RM", "MV"]
+import networkx.exception
+
 vertex_list = [
     {"label": "LA", "fullname": "Los Angeles", "pos": (1, 4)},
     {"label": "BL", "fullname": "Berlin", "pos": (5, 6)},
@@ -43,6 +45,9 @@ class Graph:
     # Reset the graph by reinitializing the graph
     def reset_graph(self, print_graph=False):
         self.__init__()
+
+        if print_graph:
+            self.print_graph()
         
     # Add new edge enter by user
     def add_new_edge(self, v1, v2):
@@ -52,12 +57,14 @@ class Graph:
         
     # Add new edge enter by user
     def remove_edge(self, v1, v2):
-        self.graph.remove_edge(v1, v2)
-        plt.title("GRAPH WITH REMOVED EDGE")
-        self.print_graph()
-
-        if print_graph:
+        try:
+            self.graph.remove_edge(v1, v2)
+            plt.title("GRAPH WITH REMOVED EDGE")
             self.print_graph()
+        except networkx.exception.NetworkXError:
+            print("This edge does not exist. It could be because this edge is not in the graph"
+                  "\nOR"
+                  "\nThe direction of the edge is wrong")
 
     '''
     Function to print the graph
@@ -156,7 +163,6 @@ class Graph:
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         plt.title("STRONGLY CONNECTED GRAPH")
         self.print_graph()
-        
 
     def function_two(self):
         # Logging
@@ -193,65 +199,3 @@ class Graph:
             plt.pause(0.1)
         else:
             print("Random edges added did not produce a path between the selected vertex.")
-
-
-# User interface for the user
-def menu():
-    print(
-        """
-        _________________________________________
-                       FUNCTIONS
-        _________________________________________
-        Choose to perform:
-        1: Check whether the graph is strongly connected
-        2: Check whether the graph has any cycle
-        3: Check the shortest path between 2 vertices
-        4: Check the Minimum Spanning Tree (MST)
-        5: Reset Graph
-        6: Remove Edges
-        7: Exit
-        """
-        )
-
-
-def user_input():
-    choice = int(input("Choice: "))
-    try:
-        while choice < 1 or choice > 7:
-            print("This is invalid choice. Try again!")
-            choice = int(input("Choice: "))
-    except ValueError:
-        print("This is invalid choice. Try again!")
-    return choice
-
-
-def function_interface(choice, graph):
-    if choice == 1:
-        pass
-    elif choice == 2:
-        print("======================================================")
-        print("| Function 2:  Check whether the graph has any cycle |")
-        print("======================================================")
-        Graph.function_two(graph)
-    elif choice == 3:
-        print("===========================================================")
-        print("| Function 3:  Check the shortest path between 2 vertices |")
-        print("===========================================================")
-
-        print("Which path would you like to find?")
-        start_vertex = input("From: ")
-        end_vertex = input("To: ")
-        Graph.function_three(graph, start_vertex, end_vertex)
-    elif choice == 4:
-        pass
-    elif choice == 5:
-        print_graph = str(input("Print graph after reset? [y/n]")).lower()
-        if print_graph == 'y':
-            Graph.reset_graph(graph, print_graph=True)
-        else:
-            Graph.reset_graph(graph)
-    elif choice == 6:
-        pass
-    else:
-        print("Something went wrong when taking user input, you have an input error. Try making an input again.")
-        return

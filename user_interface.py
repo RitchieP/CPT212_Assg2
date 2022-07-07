@@ -61,8 +61,7 @@ def function_interface(choice, graph):
     elif choice == 5:
         print_graph = str(input("Print graph after reset? [y/n]")).lower()
         if print_graph == 'y':
-            graph.reset_graph()
-            graph.print_graph()
+            graph.reset_graph(print_graph=True)
         else:
             graph.reset_graph()
     
