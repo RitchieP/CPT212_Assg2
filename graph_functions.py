@@ -35,7 +35,7 @@ class Graph:
         ])
 
         self.graph.add_weighted_edges_from([
-            (vertex_list[1]["label"], vertex_list[0]["label"], distance_LA_BL),
+            (vertex_list[1]["label"], vertex_list[0]["label"], distance_BL_LA),
             (vertex_list[1]["label"], vertex_list[2]["label"], distance_BL_SB),
             (vertex_list[2]["label"], vertex_list[3]["label"], distance_SB_RM),
             (vertex_list[3]["label"], vertex_list[4]["label"], distance_RM_MV),
@@ -131,7 +131,7 @@ class Graph:
         elif (chosen_edge[0] == "SB" or chosen_edge[1] == "SB") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
             edge_distance = distance_SB_MV
         elif chosen_edge[0] == "LA" and chosen_edge[1] == "BL":
-            edge_distance = distance_BL_LA
+            edge_distance = distance_LA_BL
         elif chosen_edge[0] == "SB" and chosen_edge[1] == "BL":
             edge_distance = distance_SB_BL
         elif chosen_edge[0] == "RM" and chosen_edge[1] == "SB":
