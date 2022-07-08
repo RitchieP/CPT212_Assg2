@@ -19,7 +19,7 @@ vertex_list = [
 class Graph:
     # Constructor to initialize the graph
     def __init__(self):
-        distance_LA_BL = 9310
+        distance_BL_LA = 9310
         distance_BL_SB = 526
         distance_SB_RM = 659
         distance_RM_MV = 11032
@@ -75,13 +75,13 @@ class Graph:
         if selected_graph is None:
             pos = nx.get_node_attributes(self.graph, "pos")
             labels = nx.get_edge_attributes(self.graph, "weight")
-            nx.draw(self.graph, pos, with_labels=True, font_weight='bold')
-            nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels)
+            nx.draw(self.graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+            nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels, font_size=7)
         else:
             pos = nx.get_node_attributes(selected_graph, "pos")
             labels = nx.get_edge_attributes(selected_graph, "weight")
-            nx.draw(selected_graph, pos, with_labels=True, font_weight='bold')
-            nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels)
+            nx.draw(selected_graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+            nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels, font_size=7)
         plt.show()
 
     # Print the adjacency list of the graph
@@ -104,8 +104,14 @@ class Graph:
         distance_BL_RM = 1184
         distance_BL_MV = 11817
         distance_SB_MV = 11477
- 
+        distance_LA_BL = 9310
+        distance_SB_BL = 526
+        distance_RM_SB = 659
+        distance_MV_RM = 11032
+        distance_LA_MV = 10020
+        
         edge_distance = 0
+        # Get the list of nodes that dose not have an edge, then randomly choose from there
         nonedges = list(nx.non_edges(self.graph))
         
         # Logging
@@ -124,6 +130,16 @@ class Graph:
             edge_distance = distance_BL_MV
         elif (chosen_edge[0] == "SB" or chosen_edge[1] == "SB") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
             edge_distance = distance_SB_MV
+        elif chosen_edge[0] == "LA" and chosen_edge[1] == "BL":
+            edge_distance = distance_BL_LA
+        elif chosen_edge[0] == "SB" and chosen_edge[1] == "BL":
+            edge_distance = distance_SB_BL
+        elif chosen_edge[0] == "RM" and chosen_edge[1] == "SB":
+            edge_distance = distance_RM_SB
+        elif chosen_edge[0] == "MV" and chosen_edge[1] == "RM":
+            edge_distance = distance_MV_RM
+        elif chosen_edge[0] == "LA" and chosen_edge[1] == "MV":
+            edge_distance = distance_LA_MV
 
         # Logging
         print("Chosen edge is between: " + chosen_edge[0] + " " + chosen_edge[1])
@@ -149,6 +165,25 @@ class Graph:
 
         return [start_vertex, end_vertex]
     
+    # Display list of available edges to ease user to select
+    def available_edges(self):
+        return list(nx.non_edges(self.graph))
+    
+    # Display list of removable edges to ease user to select which to remove
+    def removeable_edges(self):
+        return list(nx.edges(self.graph))
+    
+    #Restriction for edge selection
+    def edge_input_validation(self, start_vertex, end_vertex):
+        if (start_vertex, end_vertex) in self.graph.edges:
+            print("Edge already exists! Try another one.")
+            return False
+        elif (start_vertex, end_vertex) not in self.available_edges():
+            print("Invalid Edge! Try another one.")
+            return False
+        else:
+            return True
+
     def function_one(self):
         # Determine if the graph is strongly connected by using the networkx built-in function is_strongly_connected
         # This function returns True is it is a strongly connected graph
@@ -199,3 +234,20 @@ class Graph:
             plt.pause(0.1)
         else:
             print("Random edges added did not produce a path between the selected vertex.")
+            
+    def function_four(self,start_vertex, end_vertex):
+        user_edge = [(start_vertex, end_vertex)] #User choice not done yet (Do it in main, pass variable after self)
+        
+        while True:
+          G =  nx.restricted_view(self.graph,[],[i for i in list(self.graph.edges) if i not in user_edge])
+          try:
+              if (nx.minimum_spanning_arborescence(G)):
+                  mst = nx.minimum_spanning_arborescence(G)
+                  break
+          except nx.exception.NetworkXException:
+              if len(list(nx.non_edges(G))) > 0:
+                  random_x = random.choice(list(nx.non_edges(G)))
+                  user_edge.append(random_x)
+              else:
+                  break      
+        return mst

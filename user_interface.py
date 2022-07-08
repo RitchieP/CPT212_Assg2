@@ -53,12 +53,31 @@ def function_interface(choice, graph):
               "\n[LA / BL / SB / RM / MV]")
         start_vertex = input("From: ")
         end_vertex = input("To: ")
-        graph.function_three(graph, start_vertex, end_vertex)
+        graph.function_three(start_vertex, end_vertex)
     
     elif choice == 4:
-        pass
-    
+        print("===========================================================")
+        print("| Function 4:  Check the Minimum Spanning Tree (MST)      |")
+        print("===========================================================")
+
+        while True:
+            print("Available Edges:", [i for i in graph.available_edges()], "\n")
+            select_edge = str(input("\nSelect more available edge to generate MST? [y/n]")).lower()
+            if select_edge == 'n':
+                break
+            elif select_edge == 'y':
+                start_vertex = input("\nFrom: ")
+                end_vertex = input("To: ")
+                if graph.edge_input_validation(start_vertex, end_vertex) == True:
+                    graph.function_four(start_vertex, end_vertex)
+                    graph.print_graph()
+            else:
+                print("Invalid Input!")
+        
     elif choice == 5:
+        print("===========================================================")
+        print("| Function 5:  Reset Graph                                 |")
+        print("===========================================================")
         print_graph = str(input("Print graph after reset? [y/n]")).lower()
         if print_graph == 'y':
             graph.reset_graph(print_graph=True)
@@ -66,17 +85,24 @@ def function_interface(choice, graph):
             graph.reset_graph()
     
     elif choice == 6:
-        print("\nWhich edge would you like to add?")
-        print("\nEnter any one of the city abbreviation as follow" +
-        "\n[LA / BL / SB / RM / MV]")
-        start_vertex = input("From: ")
-        end_vertex = input("To: ")
-        graph.add_new_edge(start_vertex, end_vertex)
+        print("===========================================================")
+        print("| Function 6:  Add New Edge                                |")
+        print("===========================================================")
+        while True:
+            print("\nWhich edge would you like to add?")
+            print("Available Edges:", [i for i in graph.available_edges()], "\n")
+            start_vertex = input("From: ")
+            end_vertex = input("To: ")
+            if graph.edge_input_validation(start_vertex, end_vertex) == True:
+                graph.add_new_edge(start_vertex, end_vertex)
+                break
     
     elif choice == 7:
+        print("===========================================================")
+        print("| Function 7:  Remove Edge                                |")
+        print("===========================================================")
         print("\nWhich edge would you like to remove?")
-        print("\nEnter any one of the city abbreviation as follow" +
-        "\n[LA / BL / SB / RM / MV]")
+        print("Removable Edges:", [i for i in graph.removeable_edges()], "\n")
         start_vertex = input("From: ")
         end_vertex = input("To: ")
         graph.remove_edge(start_vertex, end_vertex)
