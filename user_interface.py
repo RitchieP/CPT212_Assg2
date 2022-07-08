@@ -60,17 +60,18 @@ def function_interface(choice, graph):
         print("| Function 4:  Check the Minimum Spanning Tree (MST)      |")
         print("===========================================================")
 
+        # TODO: Let user be able to key in multiple edges
         while True:
-            print("Available Edges:", [i for i in graph.available_edges()], "\n")
-            select_edge = str(input("\nSelect more available edge to generate MST? [y/n]")).lower()
+            print("Available Edges: ", [i for i in graph.available_edges()], "\n")
+            select_edge = str(input("\nSelect available edge to generate MST? [y/n]")).lower()
             if select_edge == 'n':
                 break
             elif select_edge == 'y':
                 start_vertex = input("\nFrom: ")
                 end_vertex = input("To: ")
-                if graph.edge_input_validation(start_vertex, end_vertex) == True:
-                    graph.function_four(start_vertex, end_vertex)
-                    graph.print_graph()
+                if graph.edge_input_validation(start_vertex, end_vertex):
+                    mst = graph.function_four(start_vertex, end_vertex)
+                    graph.print_graph(selected_graph=mst)
             else:
                 print("Invalid Input!")
         
@@ -93,7 +94,7 @@ def function_interface(choice, graph):
             print("Available Edges:", [i for i in graph.available_edges()], "\n")
             start_vertex = input("From: ")
             end_vertex = input("To: ")
-            if graph.edge_input_validation(start_vertex, end_vertex) == True:
+            if graph.edge_input_validation(start_vertex, end_vertex):
                 graph.add_new_edge(start_vertex, end_vertex)
                 break
     

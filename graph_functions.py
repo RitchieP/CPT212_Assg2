@@ -1,4 +1,3 @@
-from re import I
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
@@ -48,13 +47,13 @@ class Graph:
 
         if print_graph:
             self.print_graph()
-        
+
     # Add new edge enter by user
     def add_new_edge(self, v1, v2):
         self.graph.add_edge(v1, v2)
         plt.title("GRAPH WITH NEWLY ADDED EDGE")
         self.print_graph()
-        
+
     # Add new edge enter by user
     def remove_edge(self, v1, v2):
         try:
@@ -71,6 +70,7 @@ class Graph:
     If there is no graph or subgraph provided, the program will print the graph available inside the Graph class
     else, it will print the graph or subgraph provided
     '''
+
     def print_graph(self, selected_graph=None):
         if selected_graph is None:
             pos = nx.get_node_attributes(self.graph, "pos")
@@ -80,7 +80,7 @@ class Graph:
         else:
             pos = nx.get_node_attributes(selected_graph, "pos")
             labels = nx.get_edge_attributes(selected_graph, "weight")
-            nx.draw(selected_graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+            nx.draw_networkx(selected_graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
             nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels, font_size=7)
         plt.show()
 
@@ -96,8 +96,13 @@ class Graph:
     def has_cycle(self):
         return len(sorted(nx.simple_cycles(self.graph))) > 0
 
-    # Add a random edge in the graph
-    def add_random_edge(self):
+    '''
+    Add a random edge in the graph.
+    It will also return the vertices where the random edge was added.
+    
+    This function will also work either a graph is provided or not.
+    '''
+    def add_random_edge(self, selected_graph=None):
         # Define the other edge's distance
         distance_LA_SB = 9704
         distance_LA_RM = 10190
@@ -109,17 +114,21 @@ class Graph:
         distance_RM_SB = 659
         distance_MV_RM = 11032
         distance_LA_MV = 10020
-        
+
         edge_distance = 0
         # Get the list of nodes that dose not have an edge, then randomly choose from there
-        nonedges = list(nx.non_edges(self.graph))
-        
+        non_edges = list(nx.non_edges(self.graph if self.graph is None else selected_graph))
+
+        # Abort this function if there are already no empty available edges in the graph
+        if len(non_edges) == 0:
+            return
+
         # Logging
-        print("\nList of edges: " + str(nonedges))
-        print("Number of non-edges: " + str(len(nonedges)))
+        print("\nList of edges: " + str(non_edges))
+        print("Number of non-edges: " + str(len(non_edges)))
 
         # Compute the edge distance based on the vertex combination
-        chosen_edge = list(random.choice(nonedges))
+        chosen_edge = list(random.choice(non_edges))
         if (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "SB" or chosen_edge[1] == "SB"):
             edge_distance = distance_LA_SB
         elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "RM" or chosen_edge[1] == "RM"):
@@ -159,21 +168,21 @@ class Graph:
         print("End vertex: " + end_vertex)
 
         # Add the random edge
-        self.graph.add_weighted_edges_from([
+        (self.graph if self.graph is None else selected_graph).add_weighted_edges_from([
             (start_vertex, end_vertex, edge_distance)
         ])
 
         return [start_vertex, end_vertex]
-    
+
     # Display list of available edges to ease user to select
     def available_edges(self):
         return list(nx.non_edges(self.graph))
-    
+
     # Display list of removable edges to ease user to select which to remove
-    def removeable_edges(self):
+    def removable_edges(self):
         return list(nx.edges(self.graph))
-    
-    #Restriction for edge selection
+
+    # Restriction for edge selection
     def edge_input_validation(self, start_vertex, end_vertex):
         if (start_vertex, end_vertex) in self.graph.edges:
             print("Edge already exists! Try another one.")
@@ -189,11 +198,11 @@ class Graph:
         # This function returns True is it is a strongly connected graph
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         input("\nPress any key to continue...")
-        
+
         # Generate random edge until a strongly connected graph is found
         while not nx.is_strongly_connected(self.graph):
             self.add_random_edge()
-            
+
         # Print the graph after a strongly connected graph is found
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         plt.title("STRONGLY CONNECTED GRAPH")
@@ -221,7 +230,7 @@ class Graph:
             print("Invalid input. Please enter valid locations only.")
             return
 
-        # If no path between both vertices
+        # If no path between both vertices, we will add random edges until there is a path between selected edges,
         while not nx.has_path(self.graph, start_vertex, end_vertex):
             # Logging
             print("No path found between both vertices")
@@ -234,20 +243,34 @@ class Graph:
             plt.pause(0.1)
         else:
             print("Random edges added did not produce a path between the selected vertex.")
-            
-    def function_four(self,start_vertex, end_vertex):
-        user_edge = [(start_vertex, end_vertex)] #User choice not done yet (Do it in main, pass variable after self)
+
+    # TODO: Allow function to take in multiple edges from user input
+    def function_four(self, start_vertex, end_vertex):
+        user_edge = [(start_vertex, end_vertex)]
+        mst = None
+
+        '''
+        First generate a subgraph without the edge between the vertices selected by the user by using the
+        restricted view function.
         
+        Then check whether the graph produces a MST. If it produces a MST, break the loop and print the MST.
+        If not, loop continuously by adding edges until a MST is produced.
+        The loop will will exit if there are no more edges to add.
+        '''
+        subgraph = nx.restricted_view(self.graph, [], [i for i in list(self.graph.edges) if i in user_edge])
+
         while True:
-          G =  nx.restricted_view(self.graph,[],[i for i in list(self.graph.edges) if i not in user_edge])
-          try:
-              if (nx.minimum_spanning_arborescence(G)):
-                  mst = nx.minimum_spanning_arborescence(G)
-                  break
-          except nx.exception.NetworkXException:
-              if len(list(nx.non_edges(G))) > 0:
-                  random_x = random.choice(list(nx.non_edges(G)))
-                  user_edge.append(random_x)
-              else:
-                  break      
+
+            try:
+                if nx.minimum_spanning_arborescence(subgraph):
+                    mst = nx.minimum_spanning_arborescence(subgraph)
+                    for node in mst:
+                        mst.nodes[node]["pos"] = self.graph.nodes[node]["pos"]
+                    break
+            except nx.exception.NetworkXException:
+                if len(list(nx.non_edges(subgraph))) > 0:
+                    self.add_random_edge(selected_graph=subgraph)
+                else:
+                    print("No more edges to add.")
+                    break
         return mst
