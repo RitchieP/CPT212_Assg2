@@ -60,20 +60,37 @@ def function_interface(choice, graph):
         print("| Function 4:  Check the Minimum Spanning Tree (MST)      |")
         print("===========================================================")
 
-        # TODO: Let user be able to key in multiple edges
+        print("Available Edges: ", [i for i in graph.removable_edges()], "\n")
+        select_edge = []
+        start_vertex = input("\nFrom: ")
+        end_vertex = input("To: ")
+        if (start_vertex, end_vertex) not in select_edge and (start_vertex, end_vertex) in graph.removable_edges():
+            select_edge.append((start_vertex, end_vertex))
+        else:
+            print("Invalid input, this could be because the selected edge is already chosen, "
+                  "or not in the graph.")
+
         while True:
-            print("Available Edges: ", [i for i in graph.available_edges()], "\n")
-            select_edge = str(input("\nSelect available edge to generate MST? [y/n]")).lower()
-            if select_edge == 'n':
+            print("Available Edges: ", [i for i in graph.removable_edges() if i not in select_edge], "\n")
+            more_edges = str(input("\nSelect more available edge to generate MST? [y/n]")).lower()
+            if more_edges == 'n':
                 break
-            elif select_edge == 'y':
+            elif more_edges == 'y':
                 start_vertex = input("\nFrom: ")
                 end_vertex = input("To: ")
-                if graph.edge_input_validation(start_vertex, end_vertex):
-                    mst = graph.function_four(start_vertex, end_vertex)
-                    graph.print_graph(selected_graph=mst)
+                if (start_vertex, end_vertex) not in select_edge and (start_vertex, end_vertex) in graph.removable_edges():
+                    select_edge.append((start_vertex, end_vertex))
+                else:
+                    print("Invalid input, this could be because the selected edge is already chosen, "
+                          "or not in the graph.")
             else:
                 print("Invalid Input!")
+
+        if len(select_edge) > 0:
+            mst = graph.function_four(select_edge)
+            graph.print_graph(selected_graph=mst, curve=False, title="Minimum Spanning Tree")
+        else:
+            print("No edges was selected.")
         
     elif choice == 5:
         print("===========================================================")

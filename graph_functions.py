@@ -51,15 +51,13 @@ class Graph:
     # Add new edge enter by user
     def add_new_edge(self, v1, v2):
         self.graph.add_edge(v1, v2)
-        plt.title("GRAPH WITH NEWLY ADDED EDGE")
-        self.print_graph()
+        self.print_graph(title="Graph with newly added edge")
 
     # Add new edge enter by user
     def remove_edge(self, v1, v2):
         try:
             self.graph.remove_edge(v1, v2)
-            plt.title("GRAPH WITH REMOVED EDGE")
-            self.print_graph()
+            self.print_graph(title="Graph with removed edge")
         except networkx.exception.NetworkXError:
             print("This edge does not exist. It could be because this edge is not in the graph"
                   "\nOR"
@@ -69,19 +67,28 @@ class Graph:
     Function to print the graph
     If there is no graph or subgraph provided, the program will print the graph available inside the Graph class
     else, it will print the graph or subgraph provided
+    
+    If curve is specified to be false, the graph produced will have a straight line curve, this is to cater for printing
+    the spanning tree at function 4
+    
+    The function will also print the title of the graph if the title is given
     '''
 
-    def print_graph(self, selected_graph=None):
+    def print_graph(self, selected_graph=None, curve=True, title=None):
+        plt.title(title)
         if selected_graph is None:
             pos = nx.get_node_attributes(self.graph, "pos")
             labels = nx.get_edge_attributes(self.graph, "weight")
-            nx.draw(self.graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+            nx.draw(self.graph, pos, with_labels=True, font_weight='bold',
+                    connectionstyle="arc3,rad=0.3" if curve else "arc3")
             nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=labels, font_size=7)
         else:
             pos = nx.get_node_attributes(selected_graph, "pos")
             labels = nx.get_edge_attributes(selected_graph, "weight")
-            nx.draw_networkx(selected_graph, pos, with_labels=True, font_weight='bold', connectionstyle="arc3,rad=0.3")
+            nx.draw_networkx(selected_graph, pos, with_labels=True, font_weight='bold',
+                             connectionstyle="arc3,rad=0.3" if curve else "arc3")
             nx.draw_networkx_edge_labels(selected_graph, pos, edge_labels=labels, font_size=7)
+
         plt.show()
 
     # Print the adjacency list of the graph
@@ -117,7 +124,7 @@ class Graph:
 
         edge_distance = 0
         # Get the list of nodes that dose not have an edge, then randomly choose from there
-        non_edges = list(nx.non_edges(self.graph if self.graph is None else selected_graph))
+        non_edges = list(nx.non_edges(self.graph if selected_graph is None else selected_graph))
 
         # Abort this function if there are already no empty available edges in the graph
         if len(non_edges) == 0:
@@ -139,15 +146,15 @@ class Graph:
             edge_distance = distance_BL_MV
         elif (chosen_edge[0] == "SB" or chosen_edge[1] == "SB") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
             edge_distance = distance_SB_MV
-        elif chosen_edge[0] == "LA" and chosen_edge[1] == "BL":
+        elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "BL" or chosen_edge[1] == "BL"):
             edge_distance = distance_LA_BL
-        elif chosen_edge[0] == "SB" and chosen_edge[1] == "BL":
+        elif (chosen_edge[0] == "SB" or chosen_edge[1] == "SB") and (chosen_edge[0] == "BL" or chosen_edge[1] == "BL"):
             edge_distance = distance_SB_BL
-        elif chosen_edge[0] == "RM" and chosen_edge[1] == "SB":
+        elif (chosen_edge[0] == "RM" or chosen_edge[1] == "RM") and (chosen_edge[0] == "SB" or chosen_edge[1] == "SB"):
             edge_distance = distance_RM_SB
-        elif chosen_edge[0] == "MV" and chosen_edge[1] == "RM":
+        elif (chosen_edge[0] == "MV" or chosen_edge[1] == "MV") and (chosen_edge[0] == "RM" or chosen_edge[1] == "RM"):
             edge_distance = distance_MV_RM
-        elif chosen_edge[0] == "LA" and chosen_edge[1] == "MV":
+        elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
             edge_distance = distance_LA_MV
 
         # Logging
@@ -168,13 +175,13 @@ class Graph:
         print("End vertex: " + end_vertex)
 
         # Add the random edge
-        (self.graph if self.graph is None else selected_graph).add_weighted_edges_from([
+        (self.graph if selected_graph is None else selected_graph).add_weighted_edges_from([
             (start_vertex, end_vertex, edge_distance)
         ])
 
         return [start_vertex, end_vertex]
 
-    # Display list of available edges to ease user to select
+    # Display list of edges in the graph to ease user to select
     def available_edges(self):
         return list(nx.non_edges(self.graph))
 
@@ -205,8 +212,7 @@ class Graph:
 
         # Print the graph after a strongly connected graph is found
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
-        plt.title("STRONGLY CONNECTED GRAPH")
-        self.print_graph()
+        self.print_graph(title="Strongly connected graph")
 
     def function_two(self):
         # Logging
@@ -217,11 +223,8 @@ class Graph:
         cycle_path = sorted(nx.simple_cycles(self.graph))[0]
         print("The cycle within the graph is from: " + str(cycle_path))
 
-        cycle_graph_vertices = []
-        for j in range(len(cycle_path)):
-            cycle_graph_vertices.append((cycle_path[j], cycle_path[j % len(cycle_path)]))
         subgraph = self.graph.subgraph(cycle_path)
-        self.print_graph(selected_graph=subgraph)
+        self.print_graph(selected_graph=subgraph, title="The graph cycle")
 
     # Check shortest path
     def function_three(self, start_vertex, end_vertex):
@@ -239,14 +242,12 @@ class Graph:
         if len(nx.shortest_path(self.graph, start_vertex, end_vertex)) > 0:
             # Stores a subgraph generated from adding a random edge
             subgraph = self.graph.subgraph(nx.shortest_path(self.graph, start_vertex, end_vertex))
-            self.print_graph(selected_graph=subgraph)
+            self.print_graph(selected_graph=subgraph, curve=False, title="Shortest path")
             plt.pause(0.1)
         else:
             print("Random edges added did not produce a path between the selected vertex.")
 
-    # TODO: Allow function to take in multiple edges from user input
-    def function_four(self, start_vertex, end_vertex):
-        user_edge = [(start_vertex, end_vertex)]
+    def function_four(self, selected_edges):
         mst = None
 
         '''
@@ -257,10 +258,9 @@ class Graph:
         If not, loop continuously by adding edges until a MST is produced.
         The loop will will exit if there are no more edges to add.
         '''
-        subgraph = nx.restricted_view(self.graph, [], [i for i in list(self.graph.edges) if i in user_edge])
+        subgraph = self.graph.edge_subgraph([i for i in list(self.graph.edges) if i not in selected_edges]).copy()
 
         while True:
-
             try:
                 if nx.minimum_spanning_arborescence(subgraph):
                     mst = nx.minimum_spanning_arborescence(subgraph)
