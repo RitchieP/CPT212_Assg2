@@ -1,4 +1,5 @@
 import graph_functions
+import os
 
 def menu():
     print(
@@ -32,18 +33,21 @@ def user_input():
 
 def function_interface(choice, graph):
     if choice == 1:
+        os.system('cls')
         print("==============================================================")
         print("| Function 1:  Check whether the graph is strongly connected |")
         print("==============================================================")
         graph.function_one()
     
     elif choice == 2:
+        os.system('cls')
         print("======================================================")
         print("| Function 2:  Check whether the graph has any cycle |")
         print("======================================================")
         graph.function_two()
     
     elif choice == 3:
+        os.system('cls')
         print("===========================================================")
         print("| Function 3:  Check the shortest path between 2 vertices |")
         print("===========================================================")
@@ -56,6 +60,7 @@ def function_interface(choice, graph):
         graph.function_three(start_vertex, end_vertex)
     
     elif choice == 4:
+        os.system('cls')
         print("===========================================================")
         print("| Function 4:  Check the Minimum Spanning Tree (MST)      |")
         print("===========================================================")
@@ -93,6 +98,7 @@ def function_interface(choice, graph):
             print("No edges was selected.")
         
     elif choice == 5:
+        os.system('cls')
         print("===========================================================")
         print("| Function 5:  Reset Graph                                 |")
         print("===========================================================")
@@ -103,6 +109,7 @@ def function_interface(choice, graph):
             graph.reset_graph()
     
     elif choice == 6:
+        os.system('cls')
         print("===========================================================")
         print("| Function 6:  Add New Edge                                |")
         print("===========================================================")
@@ -116,11 +123,12 @@ def function_interface(choice, graph):
                 break
     
     elif choice == 7:
+        os.system('cls')
         print("===========================================================")
         print("| Function 7:  Remove Edge                                |")
         print("===========================================================")
         print("\nWhich edge would you like to remove?")
-        print("Removable Edges:", [i for i in graph.removeable_edges()], "\n")
+        print("Removable Edges:", [i for i in graph.removable_edges()], "\n")
         start_vertex = input("From: ")
         end_vertex = input("To: ")
         graph.remove_edge(start_vertex, end_vertex)
