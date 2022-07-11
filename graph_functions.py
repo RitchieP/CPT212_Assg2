@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
+import os
 
 # A global list of vertex to be used in the class
 # vertex_list = ["LA", "BL", "SB", "RM", "MV"]
@@ -201,18 +202,29 @@ class Graph:
             return True
 
     def function_one(self):
+        # List of random added edges
+        added_edges = []
+        
         # Determine if the graph is strongly connected by using the networkx built-in function is_strongly_connected
         # This function returns True is it is a strongly connected graph
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         input("\nPress any key to continue...")
-
+        
+        print("\nGenerating Random Edges to obtain a Strongly Connected Graph...")
         # Generate random edge until a strongly connected graph is found
         while not nx.is_strongly_connected(self.graph):
-            self.add_random_edge()
+            added_edges.append(self.add_random_edge())
 
+        # Prompt user to press any key to proceed to viewing the results
+        input("\nResult is generated. Press any key to view the result.")
+        os.system('cls') # clear the screen
+        
         # Print the graph after a strongly connected graph is found
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
-        self.print_graph(title="Strongly connected graph")
+        print("\nNumber of Added Edges: ", len(added_edges))
+        print("Randomly Added edges: ", [i for i in added_edges])
+        self.print_graph(title="Strongly Connected Graph")
+        input("\nPress any key to continue...")
 
     def function_two(self):
         # Logging

@@ -5,7 +5,7 @@ if __name__ == "__main__":
     
     graph = graph_functions.Graph()
     print("Default graph is as follow:")
-    graph.print_graph()
+    graph.print_graph(title="Default Graph")
 
     while True:
         user_interface.menu()
