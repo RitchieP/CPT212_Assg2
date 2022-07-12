@@ -13,8 +13,3 @@ if __name__ == "__main__":
         if choice == 8:
             break
         user_interface.function_interface(choice, graph)
-
-    # Printing the adjacency list for the graph
-    # graph.print_adjacency_list()1
-    
-

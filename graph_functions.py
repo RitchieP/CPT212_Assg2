@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import random
 import os
 
-# A global list of vertex to be used in the class
-# vertex_list = ["LA", "BL", "SB", "RM", "MV"]
 import networkx.exception
 
 vertex_list = [
