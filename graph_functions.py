@@ -131,10 +131,6 @@ class Graph:
         if len(non_edges) == 0:
             return
 
-        # Logging
-        print("\nList of edges: " + str(non_edges))
-        print("Number of non-edges: " + str(len(non_edges)))
-
         # Compute the edge distance based on the vertex combination
         chosen_edge = list(random.choice(non_edges))
         if (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "SB" or chosen_edge[1] == "SB"):
@@ -158,10 +154,6 @@ class Graph:
         elif (chosen_edge[0] == "LA" or chosen_edge[1] == "LA") and (chosen_edge[0] == "MV" or chosen_edge[1] == "MV"):
             edge_distance = distance_LA_MV
 
-        # Logging
-        print("Chosen edge is between: " + chosen_edge[0] + " " + chosen_edge[1])
-        print("Distance: " + str(edge_distance))
-
         '''
         Because of the edges generated is from an undirected graph, the direction will always be the same. The only
         random choice made is just the choice of edge. The code statements below will randomly select the starting edge
@@ -170,10 +162,6 @@ class Graph:
         start_vertex = random.choice(chosen_edge)
         chosen_edge.remove(start_vertex)
         end_vertex = chosen_edge[0]
-
-        # Logging
-        print("Starting vertex: " + start_vertex)
-        print("End vertex: " + end_vertex)
 
         # Add the random edge
         (self.graph if selected_graph is None else selected_graph).add_weighted_edges_from([
@@ -228,18 +216,18 @@ class Graph:
             print("Randomly Added edges: ", [i for i in added_edges])
             
         self.print_graph(title="Strongly Connected Graph")
+        self.print_adjacency_list()
 
     def function_two(self):
-        # Logging
-        print("Graph cycle: " + str(self.has_cycle()))
-
         while not self.has_cycle():
+            print("Graph does not has a cycle, adding random edges.")
             self.add_random_edge()
         cycle_path = sorted(nx.simple_cycles(self.graph))[0]
         print("The cycle within the graph is from: " + str(cycle_path))
 
         subgraph = self.graph.subgraph(cycle_path)
         self.print_graph(selected_graph=subgraph, title="The graph cycle")
+        self.print_adjacency_list()
 
     # Check shortest path
     def function_three(self, start_vertex, end_vertex):
@@ -250,8 +238,7 @@ class Graph:
 
         # If no path between both vertices, we will add random edges until there is a path between selected edges,
         while not nx.has_path(self.graph, start_vertex, end_vertex):
-            # Logging
-            print("No path found between both vertices")
+            print(f"Does not have path from {start_vertex} to {end_vertex}. Generating random edges.")
             self.add_random_edge()
 
         if len(nx.shortest_path(self.graph, start_vertex, end_vertex)) > 0:
@@ -261,6 +248,8 @@ class Graph:
             plt.pause(0.1)
         else:
             print("Random edges added did not produce a path between the selected vertex.")
+
+        self.print_adjacency_list()
 
     def function_four(self, selected_edges):
         mst = None
@@ -284,8 +273,11 @@ class Graph:
                     break
             except nx.exception.NetworkXException:
                 if len(list(nx.non_edges(subgraph))) > 0:
+                    print("No MST generated, adding random edges.")
                     self.add_random_edge(selected_graph=subgraph)
                 else:
                     print("No more edges to add.")
                     break
+
+        self.print_adjacency_list()
         return mst
