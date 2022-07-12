@@ -201,6 +201,7 @@ class Graph:
         else:
             return True
 
+    # Check strong connectivity
     def function_one(self):
         # List of random added edges
         added_edges = []
@@ -210,21 +211,24 @@ class Graph:
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         input("\nPress any key to continue...")
         
-        print("\nGenerating Random Edges to obtain a Strongly Connected Graph...")
+        # print("\nGenerating Random Edges to obtain a Strongly Connected Graph...")
         # Generate random edge until a strongly connected graph is found
         while not nx.is_strongly_connected(self.graph):
             added_edges.append(self.add_random_edge())
 
         # Prompt user to press any key to proceed to viewing the results
-        input("\nResult is generated. Press any key to view the result.")
+        input("\nPress any key to view the graph.")
         os.system('cls') # clear the screen
         
         # Print the graph after a strongly connected graph is found
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
-        print("\nNumber of Added Edges: ", len(added_edges))
-        print("Randomly Added edges: ", [i for i in added_edges])
+        
+        # Only display the added edges if any edges is added 
+        if len(added_edges) != 0:   
+            print("\nNumber of Added Edges: ", len(added_edges))
+            print("Randomly Added edges: ", [i for i in added_edges])
+            
         self.print_graph(title="Strongly Connected Graph")
-        input("\nPress any key to continue...")
 
     def function_two(self):
         # Logging
