@@ -211,7 +211,6 @@ class Graph:
         print("\nStrongly Connected Graph: " + str(nx.is_strongly_connected(self.graph)))
         input("\nPress any key to continue...")
         
-        # print("\nGenerating Random Edges to obtain a Strongly Connected Graph...")
         # Generate random edge until a strongly connected graph is found
         while not nx.is_strongly_connected(self.graph):
             added_edges.append(self.add_random_edge())
